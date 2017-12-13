@@ -23,7 +23,8 @@ void		remove_ipc_segment(int shared_memory_id)
 	{
 		if (DEBUG_MODE)
 		{
-			ft_printf("remove_ipc_segment remove exception return code (%d).\n",\
+			ft_printf(\
+				"remove_ipc_segment remove exception return code (%d).\n",\
 				rtrn);
 		}
 		return ;

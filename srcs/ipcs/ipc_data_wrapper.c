@@ -12,7 +12,7 @@
 
 #include "lemipc.h"
 
-struct s_bytebuffer *newbytebuffer(void *ptr, int size)
+struct s_bytebuffer	*newbytebuffer(void *ptr, int size)
 {
 	struct s_bytebuffer *new;
 
@@ -32,12 +32,12 @@ struct s_bytebuffer *newbytebuffer(void *ptr, int size)
 	return (new);
 }
 
-void			destruct_bytebuffer(struct s_bytebuffer *buffer)
+void				destruct_bytebuffer(struct s_bytebuffer *buffer)
 {
 	free(buffer);
 }
 
-void			write_int(struct s_bytebuffer *buffer, int n)
+void				write_int(struct s_bytebuffer *buffer, int n)
 {
 	buffer->data[buffer->position++] = ((n >> 24) & 0xFF);
 	buffer->data[buffer->position++] = ((n >> 16) & 0xFF);
@@ -45,20 +45,20 @@ void			write_int(struct s_bytebuffer *buffer, int n)
 	buffer->data[buffer->position++] = (n & 0xFF);
 }
 
-void			write_short(struct s_bytebuffer *buffer, short n)
+void				write_short(struct s_bytebuffer *buffer, short n)
 {
 	buffer->data[buffer->position++] = ((n >> 8) & 0xFF);
 	buffer->data[buffer->position++] = (n & 0xFF);
 }
 
-void			write_char(struct s_bytebuffer *buffer, char c)
+void				write_char(struct s_bytebuffer *buffer, char c)
 {
 	buffer->data[buffer->position++] = (c & 0xFF);
 	buffer->data += 1;
 	buffer->position += 1;
 }
 
-void			write_string(struct s_bytebuffer *buffer, char *s)
+void				write_string(struct s_bytebuffer *buffer, char *s)
 {
 	size_t	length;
 
@@ -68,13 +68,14 @@ void			write_string(struct s_bytebuffer *buffer, char *s)
 	buffer->position += length;
 }
 
-void			write_memory(struct s_bytebuffer *buffer, void *m, size_t size)
+void				write_memory(struct s_bytebuffer *buffer,\
+					void *m, size_t size)
 {
 	ft_memcpy(buffer->data, m, size);
 	buffer->position += size;
 }
 
-int				read_int(struct s_bytebuffer *buffer)
+int					read_int(struct s_bytebuffer *buffer)
 {
 	return (((buffer->data[buffer->position++] & 0xFF) << 24)\
 			+ ((buffer->data[buffer->position++] & 0xFF) << 16)\
@@ -82,18 +83,40 @@ int				read_int(struct s_bytebuffer *buffer)
 			+ ((buffer->data[buffer->position++] & 0xFF)));
 }
 
-short			read_short(struct s_bytebuffer *buffer)
+short				read_short(struct s_bytebuffer *buffer)
 {
 	return (((buffer->data[buffer->position++] & 0xFF) << 8)\
 			+ (buffer->data[buffer->position++] & 0xFF));
 }
 
-char			read_char(struct s_bytebuffer *buffer)
+char				read_char(struct s_bytebuffer *buffer)
 {
 	return (buffer->data[buffer->position++] & 0xFF);
 }
 
-char			*read_string(struct s_bytebuffer *buffer)
+void				write_int_on_pos(struct s_bytebuffer *buffer, int pos, int value)
+{
+	int							tmp_position;
+
+	tmp_position = buffer->position;
+	buffer->position = pos;
+	buffer->write_int(buffer, value);
+	buffer->position = tmp_position;
+}
+
+int					read_int_on_pos(struct s_bytebuffer *buffer, int pos)
+{
+	int							value;
+	int							tmp_position;
+
+	tmp_position = buffer->position;
+	buffer->position = pos;
+	value = buffer->read_int(buffer);
+	buffer->position = tmp_position;
+	return (value);
+}
+
+char				*read_string(struct s_bytebuffer *buffer)
 {
 	char	*str;
 	int		length;

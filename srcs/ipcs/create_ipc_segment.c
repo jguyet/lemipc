@@ -20,7 +20,8 @@ int			create_ipc_segment(key_t key, int size)
 	{
 		if (DEBUG_MODE)
 		{
-			ft_printf("create_ipc_segment creation exception return code (%d)\n",\
+			ft_printf(\
+				"create_ipc_segment creation exception return code (%d)\n",\
 				shmid);
 		}
 		return (-1);

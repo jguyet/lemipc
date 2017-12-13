@@ -45,6 +45,8 @@ SRCSPROG1	=	\
 				srcs/ipcs/ipc_segment_exists.c												\
 				srcs/ipcs/ipc_data_wrapper.c												\
 				srcs/ipcs/ipc_detache_segment.c												\
+				srcs/lemipc_protocol_header.c												\
+				srcs/lemipc_player.c														\
 				srcs/prepare_lem.c															\
 				srcs/lem.c
 

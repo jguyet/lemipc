@@ -24,12 +24,13 @@ static int			get_ipc_segment_data_size(key_t key)
 	if (!(data = get_ipc_segment_data(shared_segment_id)))
 		return (-1);
 	buffer = newbytebuffer(data, 4);
-	shared_segment_size = buffer->read_int(buffer);
+	shared_segment_size = get_header_segment_size(buffer);
 	destruct_bytebuffer(buffer);
 	return (shared_segment_size);
 }
 
-static t_bytebuffer	*get_bytebuffer_ipc_segment_data(int shared_segement_id, size_t shared_segment_size)
+static t_bytebuffer	*get_bytebuffer_ipc_segment_data(int shared_segement_id,\
+					size_t shared_segment_size)
 {
 	char			*data;
 	t_bytebuffer	*buffer;
@@ -49,14 +50,18 @@ void				get_ipc_segment_and_play(void)
 	ft_printf("get_ipc_segment_and_play\n");
 	if (!(lem = newlem()))
 		return ;
-	if ((lem->shared_segment_size = get_ipc_segment_data_size(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY)) == -1)
+	if ((lem->shared_segment_size =\
+		get_ipc_segment_data_size(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY)) == -1)
 		return ;
-	if ((lem->shared_segment_id = get_ipc_segment(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY, lem->shared_segment_size)) < 0)
+	if ((lem->shared_segment_id =\
+		get_ipc_segment(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY,\
+		lem->shared_segment_size)) < 0)
 		return ;
-	if (!(buffer = get_bytebuffer_ipc_segment_data(lem->shared_segment_id, lem->shared_segment_size)))
+	if (!(buffer =\
+		get_bytebuffer_ipc_segment_data(lem->shared_segment_id,\
+		lem->shared_segment_size)))
 		return ;
 	lem->buffer = buffer;
-	lem->buffer->position += 4;
 	if (play(lem) == -1)
 		remove_ipc_segment(lem->shared_segment_id);
 	destruct_bytebuffer(buffer);
@@ -65,16 +70,20 @@ void				get_ipc_segment_and_play(void)
 
 void				create_ipc_segment_and_play(void)
 {
-	int				shared_segement_id;
-	char			*data;
-	t_bytebuffer	*buffer;
+	int					shared_segement_id;
+	char				*data;
+	t_bytebuffer		*buffer;
 
 	ft_printf("create_ipc_segment_and_play\n");
-	if ((shared_segement_id = create_ipc_segment(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY, MAPSIZE + 4)) < 0)
+	if ((shared_segement_id =\
+		create_ipc_segment(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY,\
+		DEFAULT_IPC_SHARED_SEGMENT_MEMORY_SIZE)) < 0)
 		return ;
 	data = get_ipc_segment_data(shared_segement_id);
-	buffer = newbytebuffer(data, MAPSIZE);
-	buffer->write_int(buffer, MAPSIZE + 4);
+	buffer = newbytebuffer(data, DEFAULT_IPC_SHARED_SEGMENT_MEMORY_SIZE);
+	ft_memset(buffer->data, 0, DEFAULT_IPC_SHARED_SEGMENT_MEMORY_SIZE);
+	write_header_segment_size(buffer, DEFAULT_IPC_SHARED_SEGMENT_MEMORY_SIZE);
+	write_header_players_offset(buffer, 20);
 	destruct_bytebuffer(buffer);
 	get_ipc_segment_and_play();
 }

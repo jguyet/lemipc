@@ -12,31 +12,114 @@
 
 #include "lemipc.h"
 
-struct s_lemipc_protocol_header	*new_lemipc_protocol_header(void)
-{
-	struct s_lemipc_protocol_header	*new;
+#include <unistd.h>
 
-	if (!(new = (struct s_lemipc_protocol_header*)malloc(sizeof(struct s_lemipc_protocol_header))))
-		return (NULL);
-	return (new);
+void	wait_unlock_ipc(struct s_bytebuffer *buffer)
+{
+	while (header_is_writable(buffer) == false) {
+		ft_printf("Wait locked\n");
+		usleep(50000);
+	}
 }
 
-void							write_lemipc_protocol_header(\
-	struct s_bytebuffer buffer,\
-	struct s_lemipc_protocol_header *header)
+int	get_header_segment_size(struct s_bytebuffer *buffer)
 {
-	buffer->write_int(header->shared_segment_size);
-	buffer->write_int(header->max_player_id);
-	buffer->write_int(header->number_of_player);
-	buffer->write_int(header->map_size);
-	buffer->write_int(header->players_pos_offset);
+	return (read_int_on_pos(buffer, 0));
 }
-/*
-**           23
-**        21 11 24
-**      20 10 4 12 25
-**     19 9 3 0 1 5 13
-**       18 8 2 6 14
-**         17 7 15
-**           16
-*/
+
+BOOLEAN	header_is_writable(struct s_bytebuffer *buffer)
+{
+	return (read_int_on_pos(buffer, 4) == UNLOCK);
+}
+
+int	get_header_max_player_id(struct s_bytebuffer *buffer)
+{
+	return (read_int_on_pos(buffer, 8));
+}
+
+int	get_header_number_of_player(struct s_bytebuffer *buffer)
+{
+	return (read_int_on_pos(buffer, 12));
+}
+
+int	get_header_players_offset(struct s_bytebuffer *buffer)
+{
+	return (read_int_on_pos(buffer, 16));
+}
+
+void	write_header_segment_size(struct s_bytebuffer *buffer, int segment_size)
+{
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	write_int_on_pos(buffer, 0, segment_size);
+	unlock_ipc(buffer);
+}
+
+void	unlock_ipc(struct s_bytebuffer *buffer)
+{
+	write_int_on_pos(buffer, 4, UNLOCK);
+}
+
+void	lock_ipc(struct s_bytebuffer *buffer)
+{
+	wait_unlock_ipc(buffer);
+	write_int_on_pos(buffer, 4, LOCK);
+}
+
+void	write_header_max_player_id(struct s_bytebuffer *buffer, int id)
+{
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	write_int_on_pos(buffer, 8, id);
+	unlock_ipc(buffer);
+}
+
+void	write_header_number_of_player(struct s_bytebuffer *buffer, int n)
+{
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	write_int_on_pos(buffer, 12, n);
+	unlock_ipc(buffer);
+}
+
+void	write_header_players_offset(struct s_bytebuffer *buffer, int offset)
+{
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	write_int_on_pos(buffer, 16, offset);
+	unlock_ipc(buffer);
+}
+
+void	add_one_number_of_player(struct s_bytebuffer *buffer)
+{
+	int number;
+
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	number = get_header_number_of_player(buffer);
+	write_int_on_pos(buffer, 12, number + 1);
+	unlock_ipc(buffer);
+}
+
+void	remove_one_number_of_player(struct s_bytebuffer *buffer)
+{
+	int number;
+
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	number = get_header_number_of_player(buffer);
+	write_int_on_pos(buffer, 12, number - 1);
+	unlock_ipc(buffer);
+}
+
+int		get_next_player_id(struct s_bytebuffer *buffer)
+{
+	int id;
+
+	wait_unlock_ipc(buffer);
+	lock_ipc(buffer);
+	id = get_header_max_player_id(buffer);
+	write_int_on_pos(buffer, 8, id + 1);
+	unlock_ipc(buffer);
+	return (id);
+}
