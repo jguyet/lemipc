@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ipc_detache_segment.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jguyet <jguyet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/12/12 11:01:22 by jguyet            #+#    #+#             */
-/*   Updated: 2017/12/13 15:11:44 by jguyet           ###   ########.fr       */
+/*   Created: 2017/12/13 18:08:50 by jguyet            #+#    #+#             */
+/*   Updated: 2017/12/13 18:08:51 by jguyet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lemipc.h"
 
-int	play(t_lem *lem)
+int			ipc_detache_segment(void *shmaddr)
 {
-	(void)lem;
-	ft_printf("PLAY\n");
-	return (-1);
-}
+	int		shmid;
 
-int		main(int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-
-	if (ipc_segment_exists(DEFAULT_KEY_IPC_SHARED_SEGMENT_MEMORY))
+	if ((shmid = shmdt(shmaddr)) < 0)
 	{
-		get_ipc_segment_and_play();
+		if (DEBUG_MODE)
+		{
+			ft_printf("ipc_detache_segment shmdt exception return code (%d)\n",\
+				shmid);
+		}
+		return (-1);
 	}
-	else
-	{
-		create_ipc_segment_and_play();
-	}
-	return (0);
+	return (shmid);
 }

@@ -6,7 +6,7 @@
 /*   By: jguyet <jguyet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/12 13:17:21 by jguyet            #+#    #+#             */
-/*   Updated: 2017/12/12 13:17:22 by jguyet           ###   ########.fr       */
+/*   Updated: 2017/12/13 15:13:35 by jguyet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 
 void		*get_ipc_segment_data(int shared_memory_id)
 {
-    void    *shm;
+	void	*shm;
 
-    if ((shm = shmat(shared_memory_id, NULL, 0)) == (char *) -1)
-    {
-        perror("get_ipc_segment_data shmat exception.");
-        exit(1);
-    }
-    return (shm);
+	if ((shm = shmat(shared_memory_id, NULL, 0)) == (char*)-1)
+	{
+		if (DEBUG_MODE)
+		{
+			ft_printf("get_ipc_segment_data shmat exception type (NULL).");
+		}
+		return (NULL);
+	}
+	return (shm);
 }

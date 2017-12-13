@@ -41,7 +41,12 @@ SRCSPROG1	=	\
 				srcs/ipcs/create_ipc_segment.c												\
 				srcs/ipcs/get_ipc_segment.c													\
 				srcs/ipcs/get_ipc_segment_data.c											\
-				srcs/ipcs/remove_ipc_segment.c
+				srcs/ipcs/remove_ipc_segment.c												\
+				srcs/ipcs/ipc_segment_exists.c												\
+				srcs/ipcs/ipc_data_wrapper.c												\
+				srcs/ipcs/ipc_detache_segment.c												\
+				srcs/prepare_lem.c															\
+				srcs/lem.c
 
 DSRCSPROG1	=	$(addprefix $(SRCDIR), $(SRCSPROG1))
 
@@ -50,9 +55,9 @@ OBJSPROG1	=	$(addprefix $(OBJDIR), $(DSRCSPROG1:.c=.o))
 .SILENT:
 
 all:
-	if test ! -f $(AUTHOR) ; then															\
-		echo "$(STUDENT)" > $(AUTHOR);														\
-	fi
+	##if test ! -f $(AUTHOR) ; then															\
+	##	echo "$(STUDENT)" > $(AUTHOR);														\
+	##fi
 	if test -f $(PROG1) ; then																\
 		echo "make: Nothing to be done for \`all\`.";										\
 	else																					\
@@ -64,7 +69,7 @@ $(STUDENT):
 	$(MAKE) $(PROG1)
 
 $(PROG1):	$(OBJDIR) $(OBJSPROG1)
-	$(CC) $(FLAGS) -o $(PROG1) $(OBJSPROG1) -L $(LIBFTDIR) -lftprintf
+	$(CC) $(FLAGS) -o $(PROG1) $(OBJSPROG1) -L $(LIBFTDIR) -lft
 	echo "MAKE    [$(PROG1)]"
 	echo "\033[38;5;227mAUTHOR  :\033[0m"
 	cat -e $(AUTHOR)

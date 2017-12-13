@@ -6,7 +6,7 @@
 /*   By: jguyet <jguyet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/12 13:02:50 by jguyet            #+#    #+#             */
-/*   Updated: 2017/12/12 13:07:08 by jguyet           ###   ########.fr       */
+/*   Updated: 2017/12/13 15:13:54 by jguyet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,20 @@ void		remove_ipc_segment(int shared_memory_id)
 {
 	struct shmid_ds	shmid_ds;
 	int				cmd;
-    register int    rtrn;
+	register int	rtrn;
 
-    cmd = IPC_RMID;
+	cmd = IPC_RMID;
 	if ((rtrn = shmctl(shared_memory_id, cmd, &shmid_ds)) == -1)
 	{
-		ft_printf("remove_ipc_segment remove exception return code (%d).\n", rtrn);
+		if (DEBUG_MODE)
+		{
+			ft_printf("remove_ipc_segment remove exception return code (%d).\n",\
+				rtrn);
+		}
 		return ;
 	}
-    ft_printf("ipcs segment removed return code (%d)\n", rtrn);
+	if (DEBUG_MODE)
+	{
+		ft_printf("ipcs segment removed return code (%d)\n", rtrn);
+	}
 }
